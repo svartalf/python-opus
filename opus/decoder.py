@@ -60,6 +60,22 @@ def packet_get_bandwidth(data):
     return result
 
 
+_packet_get_nb_channels = libopus.opus_packet_get_nb_channels
+_packet_get_nb_channels.argtypes = (ctypes.c_char_p,)
+_packet_get_nb_channels.restype = ctypes.c_int
+
+def packet_get_nb_channels(data):
+    """Gets the number of channels from an Opus packet"""
+
+    data_pointer = ctypes.c_char_p(data)
+
+    result = _packet_get_nb_channels(data_pointer)
+    if result == constants.INVALID_PACKET:
+        raise ValueError('The compressed data passed is corrupted or of an unsupported type')
+
+    return result
+
+
 destroy = libopus.opus_decoder_destroy
 destroy.argtypes = (DecoderPointer,)
 destroy.restype = None
@@ -70,4 +86,5 @@ if __name__ == '__main__':
     print get_size(1)
     print get_size(2)
     print packet_get_bandwidth('some strange data')
+    print packet_get_nb_channels('another strange data')
     destroy(decoder)
