@@ -3,6 +3,9 @@
 import ctypes
 from ctypes.util import find_library
 
+from info import strerror
+import constants
+
 
 libopus = ctypes.CDLL(find_library('opus'))
 c_int_pointer = ctypes.POINTER(ctypes.c_int)
@@ -19,17 +22,10 @@ class Decoder(ctypes.Structure):
 DecoderPointer = ctypes.POINTER(Decoder)
 
 
-_get_size = libopus.opus_decoder_get_size
-_get_size.argtypes = (ctypes.c_int,)
-_get_size.restype = ctypes.c_int
-
-def get_size(channels):
-    """Gets the size of an OpusDecoder structure"""
-
-    if not channels in (1, 2):
-        raise ValueError()  # TODO: error message
-
-    return _get_size(channels)
+get_size = libopus.opus_decoder_get_size
+get_size.argtypes = (ctypes.c_int,)
+get_size.restype = ctypes.c_int
+get_size.__doc__ = 'Gets the size of an OpusDecoder structure'
 
 
 _create = libopus.opus_decoder_create
@@ -39,16 +35,27 @@ _create.restype = DecoderPointer
 def create(fs, channels):
     """Allocates and initializes a decoder state"""
 
-    if fs not in (8000, 12000, 16000, 24000, 48000):
-        raise ValueError('Wrong fs value. Must be equal to 8000, 12000, 16000, 24000 or 48000')
-
-    if not channels in (1, 2):
-        raise ValueError('Wrong channels value. Must be equal to 1 or 2')
-
     result_code = ctypes.c_int()
 
     result = _create(fs, channels, ctypes.byref(result_code))
-    # TODO: check for `result_code` value and raise an exception if needed
+    if result_code.value != 0:
+        raise ValueError(strerror(result_code.value))
+
+    return result
+
+
+_packet_get_bandwidth = libopus.opus_packet_get_bandwidth
+_packet_get_bandwidth.argtypes = (ctypes.c_char_p,)
+_packet_get_bandwidth.restype = ctypes.c_int
+
+def packet_get_bandwidth(data):
+    """Gets the bandwidth of an Opus packet."""
+
+    data_pointer = ctypes.c_char_p(data)
+
+    result = _packet_get_bandwidth(data_pointer)
+    if result == constants.INVALID_PACKET:
+        raise ValueError('The compressed data passed is corrupted or of an unsupported type')
 
     return result
 
@@ -62,4 +69,5 @@ if __name__ == '__main__':
     decoder = create(12000, 2)
     print get_size(1)
     print get_size(2)
+    print packet_get_bandwidth('some strange data')
     destroy(decoder)

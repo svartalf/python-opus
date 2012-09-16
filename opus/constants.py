@@ -1,7 +1,21 @@
+# -*- coding: utf-8 -*-
+
+"""Matches to `opus_defines.h`"""
+
+INVALID_PACKET = -4
+
+
 # Pre-defined values for CTL interface
 
 APPLICATION_VOIP = 2048
-
 APPLICATION_AUDIO = 2049
-
 APPLICATION_RESTRICTED_LOWDELAY = 2051
+
+
+# Values for the various encoder CTLs
+
+BANDWIDTH_NARROWBAND = 1101
+BANDWIDTH_MEDIUMBAND = 1102
+BANDWIDTH_WIDEBAND = 1103
+BANDWIDTH_SUPERWIDEBAND = 1104
+BANDWIDTH_FULLBAND = 1105
