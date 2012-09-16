@@ -45,5 +45,12 @@ def create(fs, channels, application):
 
     return result
 
+destroy = libopus.opus_encoder_destroy
+destroy.argtypes = (EncoderPointer,)
+destroy.restype = None
+destroy.__doc__ = "Frees an OpusEncoder allocated by opus_encoder_create()"
+
+
 if __name__ == '__main__':
-    create(12000, 2, constants.APPLICATION_VOIP)
+    encoder_state = create(12000, 2, constants.APPLICATION_VOIP)
+    destroy(encoder_state)
