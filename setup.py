@@ -10,6 +10,7 @@ setup(
     url='https://github.com/svartalf/python-opus',
     description='Python bindings to the libopus, IETF low-delay audio codec',
     packages=('opus',),
+    test_suite='tests',
     classifiers=(
         'Development Status :: 1 - Planning',
         'Intended Audience :: Developers',
