@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import ctypes
 
 import unittest
 
@@ -34,10 +35,6 @@ class DecoderStereo8Bit(unittest.TestCase):
 
     def tearDown(self):
         opus.decoder.destroy(self.decoder)
-
-    def test_get_size(self):
-        self.assertEqual(18196, opus.decoder.get_size(1))
-        self.assertEqual(26964, opus.decoder.get_size(2))
 
     def test_packet_get_bandwidth(self):
         self.assertEqual(opus.constants.BANDWIDTH_WIDEBAND, opus.decoder.packet_get_bandwidth(self.data))
