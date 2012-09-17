@@ -9,7 +9,7 @@ import constants
 
 libopus = ctypes.CDLL(find_library('opus'))
 c_int_pointer = ctypes.POINTER(ctypes.c_int)
-
+c_int16_pointer = ctypes.POINTER(ctypes.c_int16)
 
 class Decoder(ctypes.Structure):
     """Opus decoder state.
@@ -76,15 +76,41 @@ def packet_get_nb_channels(data):
     return result
 
 
+_packet_get_nb_frames = libopus.opus_packet_get_nb_frames
+_packet_get_nb_frames.argtypes = (ctypes.c_char_p, ctypes.c_int)
+_packet_get_nb_frames.restype = ctypes.c_int
+
+def packet_get_nb_frames(data, length=None):
+    """Gets the number of frames in an Opus packet"""
+
+    data_pointer = ctypes.c_char_p(data)
+    if length is None:
+        length = len(data)
+
+    result = _packet_get_nb_frames(data_pointer, ctypes.c_int(length))
+    if result == constants.INVALID_PACKET:
+        raise ValueError('The compressed data passed is corrupted or of an unsupported type')
+
+    return result
+
+
+_packet_get_samples_per_frame = libopus.opus_packet_get_samples_per_frame
+_packet_get_samples_per_frame.argtypes = (ctypes.c_char_p, ctypes.c_int)
+_packet_get_samples_per_frame.restype = ctypes.c_int
+
+def packet_get_samples_per_frame(data, fs):
+    """Gets the number of samples per frame from an Opus packet"""
+
+    data_pointer = ctypes.c_char_p(data)
+
+    result = _packet_get_nb_frames(data_pointer, ctypes.c_int(fs))
+    if result == constants.INVALID_PACKET:
+        raise ValueError('The compressed data passed is corrupted or of an unsupported type')
+
+    return result
+
+
 destroy = libopus.opus_decoder_destroy
 destroy.argtypes = (DecoderPointer,)
 destroy.restype = None
 destroy.__doc__ = 'Frees an OpusDecoder allocated by opus_decoder_create()'
-
-if __name__ == '__main__':
-    decoder = create(12000, 2)
-    print get_size(1)
-    print get_size(2)
-    print packet_get_bandwidth('some strange data')
-    print packet_get_nb_channels('another strange data')
-    destroy(decoder)

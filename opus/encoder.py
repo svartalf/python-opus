@@ -60,11 +60,3 @@ destroy = libopus.opus_encoder_destroy
 destroy.argtypes = (EncoderPointer,)
 destroy.restype = None
 destroy.__doc__ = "Frees an OpusEncoder allocated by opus_encoder_create()"
-
-
-if __name__ == '__main__':
-    encoder_state = create(12000, 2, constants.APPLICATION_VOIP)
-    print get_size(1)
-    print get_size(2)
-
-    destroy(encoder_state)
