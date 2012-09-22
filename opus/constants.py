@@ -2,8 +2,8 @@
 
 """Matches to `opus_defines.h`"""
 
+BAD_ARG = -1
 INVALID_PACKET = -4
-
 
 # Pre-defined values for CTL interface
 

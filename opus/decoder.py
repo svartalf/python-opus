@@ -5,6 +5,7 @@ from ctypes.util import find_library
 
 from info import strerror
 import constants
+from exceptions import OpusError
 
 
 libopus = ctypes.CDLL(find_library('opus'))
@@ -38,8 +39,8 @@ def create(fs, channels):
     result_code = ctypes.c_int()
 
     result = _create(fs, channels, ctypes.byref(result_code))
-    if result_code.value != 0:
-        raise ValueError(strerror(result_code.value))
+    if result_code.value is not 0:
+        raise OpusError(result_code.value, strerror(result_code.value))
 
     return result
 
@@ -54,8 +55,8 @@ def packet_get_bandwidth(data):
     data_pointer = ctypes.c_char_p(data)
 
     result = _packet_get_bandwidth(data_pointer)
-    if result == constants.INVALID_PACKET:
-        raise ValueError('The compressed data passed is corrupted or of an unsupported type')
+    if result < 0:
+        raise OpusError(result, strerror(result))
 
     return result
 
@@ -70,8 +71,8 @@ def packet_get_nb_channels(data):
     data_pointer = ctypes.c_char_p(data)
 
     result = _packet_get_nb_channels(data_pointer)
-    if result == constants.INVALID_PACKET:
-        raise ValueError('The compressed data passed is corrupted or of an unsupported type')
+    if result < 0:
+        raise OpusError(result, strerror(result))
 
     return result
 
@@ -88,8 +89,8 @@ def packet_get_nb_frames(data, length=None):
         length = len(data)
 
     result = _packet_get_nb_frames(data_pointer, ctypes.c_int(length))
-    if result == constants.INVALID_PACKET:
-        raise ValueError('The compressed data passed is corrupted or of an unsupported type')
+    if result < 0:
+        raise OpusError(result, strerror(result))
 
     return result
 
@@ -104,11 +105,41 @@ def packet_get_samples_per_frame(data, fs):
     data_pointer = ctypes.c_char_p(data)
 
     result = _packet_get_nb_frames(data_pointer, ctypes.c_int(fs))
-    if result == constants.INVALID_PACKET:
-        raise ValueError('The compressed data passed is corrupted or of an unsupported type')
+    if result < 0:
+        raise OpusError(result, strerror(result))
 
     return result
 
+_decode = libopus.opus_decode
+_decode.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, c_int16_pointer, ctypes.c_int, ctypes.c_int)
+_decode.restype = ctypes.c_int
+
+
+_get_nb_samples = libopus.opus_decoder_get_nb_samples
+_get_nb_samples.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32)
+_get_nb_samples.restype = ctypes.c_int
+
+def get_nb_samples(decoder, packet, length):
+    result = _get_nb_samples(decoder, packet, length)
+    if result < 0:
+        raise OpusError(result, strerror(result))
+
+    return result
+
+
+def decode(decoder, data, length, frame_size, decode_fec):
+    pcm_size =  frame_size*2*ctypes.sizeof(ctypes.c_int16)  # TODO: channels value must be changeable
+    pcm = (ctypes.c_int16*pcm_size)()
+    pcm_pointer = ctypes.cast(pcm, c_int16_pointer)
+
+    # Converting from a boolean to int
+    decode_fec = int(bool(decode_fec))
+
+    result = _decode(decoder, data, length, pcm_pointer, frame_size, decode_fec)
+    if result < 0:
+        raise OpusError(result, strerror(result))
+
+    return result
 
 destroy = libopus.opus_decoder_destroy
 destroy.argtypes = (DecoderPointer,)
