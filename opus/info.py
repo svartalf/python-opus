@@ -17,12 +17,3 @@ get_version_string = libopus.opus_get_version_string
 get_version_string.argtypes = None
 get_version_string.restype = ctypes.c_char_p
 get_version_string.__doc__ = 'Gets the libopus version string'
-
-
-if __name__ == '__main__':
-    print get_version_string()
-    print strerror(-1)
-    print strerror(-2)
-    print strerror(-3)
-    print strerror(-4)
-    print strerror(-5)

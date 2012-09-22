@@ -2,6 +2,7 @@
 
 """Matches to `opus_defines.h`"""
 
+OK = 0
 BAD_ARG = -1
 INVALID_PACKET = -4
 
