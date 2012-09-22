@@ -2,9 +2,18 @@
 
 """Matches to `opus_defines.h`"""
 
+# No Error
 OK = 0
+
+# One or more invalid/out of range arguments
 BAD_ARG = -1
+
+# The mode struct passed is invalid
+BUFFER_TOO_SMALL = -2
+
+# The compressed data passed is corrupted
 INVALID_PACKET = -4
+
 
 # Pre-defined values for CTL interface
 

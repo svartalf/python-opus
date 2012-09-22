@@ -18,6 +18,10 @@ TESTVECTORS = {
 
 
 class DecoderTest(unittest.TestCase):
+    """Decoder basic API tests
+
+    From the `tests/test_opus_api.c`
+    """
 
     def test_get_size(self):
         """Invalid configurations which should fail"""
@@ -50,25 +54,30 @@ class DecoderTest(unittest.TestCase):
                     fs = i
 
                 try:
-                    decoder.create(fs, c)
+                    dec = decoder.create(fs, c)
                 except OpusError as e:
                     self.assertEqual(e.code, constants.BAD_ARG)
+                else:
+                    decoder.destroy(dec)
 
     def test_create(self):
         try:
-            decoder.create(48000, 2)
+            dec = decoder.create(48000, 2)
         except OpusError:
             raise AssertionError()
+        else:
+            decoder.destroy(dec)
 
-        # TODO: rewrite this code
+
+            # TODO: rewrite this code
         # VG_CHECK(dec,opus_decoder_get_size(2));
 
-    def test_decode(self):
-        dec = decoder.create(48000, 2)
-
-        packet = ''.join([chr(x) for x in (63<<2, 0, 0)])
-
-        self.assertEqual(960, decoder.decode(dec, packet, 3, 960, False))
+    #def test_decode(self):
+    #    dec = decoder.create(48000, 2)
+    #
+    #    packet = ''.join([chr(x) for x in (63<<2, 0, 0)])
+    #
+    #    self.assertEqual(960, decoder.decode(dec, packet, 3, 960, False))
 
     def test_get_nb_samples(self):
         """opus_decoder_get_nb_samples()"""
@@ -80,6 +89,9 @@ class DecoderTest(unittest.TestCase):
         packet = ''.join([chr(x) for x in ((63<<2)|3, 63)])
         # TODO: check for exception code
         self.assertRaises(OpusError, lambda: decoder.get_nb_samples(dec, packet, 2))
+
+        decoder.destroy(dec)
+
 
     def test_packet_get_nb_frames(self):
         """opus_packet_get_nb_frames()"""
@@ -116,3 +128,39 @@ class DecoderTest(unittest.TestCase):
             bw = constants.BANDWIDTH_NARROWBAND+(((((bw&7)*9)&(63-(bw&8)))+2+12*((bw&8)!=0))>>4)
 
             self.assertEqual(bw, decoder.packet_get_bandwidth(packet))
+
+    def test_decode(self):
+        """opus_decode()"""
+
+        packet = chr((63<<2)+3)+chr(49)
+        for j in range(2, 51):
+            packet += chr(0)
+
+        dec = decoder.create(48000, 2)
+        try:
+            decoder.decode(dec, packet, 51, 960, 0)
+        except OpusError as e:
+            self.assertEqual(e.code, constants.INVALID_PACKET)
+
+        packet = chr(63<<2)+chr(0)+chr(0)
+        try:
+            decoder.decode(dec, packet, -1, 960, 0)
+        except OpusError as e:
+            self.assertEqual(e.code, constants.BAD_ARG)
+
+        try:
+            decoder.decode(dec, packet, 3, 60, 0)
+        except OpusError as e:
+            self.assertEqual(e.code, constants.BUFFER_TOO_SMALL)
+
+        try:
+            decoder.decode(dec, packet, 3, 480, 0)
+        except OpusError as e:
+            self.assertEqual(e.code, constants.BUFFER_TOO_SMALL)
+
+        try:
+            packet = decoder.decode(dec, packet, 3, 960, 0)
+        except OpusError:
+            self.fail('Decode failed')
+
+        decoder.destroy(dec)

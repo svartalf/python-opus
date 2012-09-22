@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import array
 import ctypes
 from ctypes.util import find_library
 
@@ -110,10 +111,6 @@ def packet_get_samples_per_frame(data, fs):
 
     return result
 
-_decode = libopus.opus_decode
-_decode.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, c_int16_pointer, ctypes.c_int, ctypes.c_int)
-_decode.restype = ctypes.c_int
-
 
 _get_nb_samples = libopus.opus_decoder_get_nb_samples
 _get_nb_samples.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32)
@@ -127,6 +124,10 @@ def get_nb_samples(decoder, packet, length):
     return result
 
 
+_decode = libopus.opus_decode
+_decode.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, c_int16_pointer, ctypes.c_int, ctypes.c_int)
+_decode.restype = ctypes.c_int
+
 def decode(decoder, data, length, frame_size, decode_fec):
     pcm_size =  frame_size*2*ctypes.sizeof(ctypes.c_int16)  # TODO: channels value must be changeable
     pcm = (ctypes.c_int16*pcm_size)()
@@ -139,7 +140,7 @@ def decode(decoder, data, length, frame_size, decode_fec):
     if result < 0:
         raise OpusError(result, strerror(result))
 
-    return result
+    return array.array('h', pcm).tostring()
 
 destroy = libopus.opus_decoder_destroy
 destroy.argtypes = (DecoderPointer,)
