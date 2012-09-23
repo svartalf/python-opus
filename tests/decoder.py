@@ -2,19 +2,9 @@
 
 import unittest
 import sys
-import ctypes
 
 from opus import decoder, constants
 from opus.exceptions import OpusError
-
-
-TESTVECTORS = {
-    'testvector1.bit': {
-        'bitrate': 8000,
-        'channels': 2,
-        'frames': 1,
-    },
-}
 
 
 class DecoderTest(unittest.TestCase):
@@ -159,7 +149,18 @@ class DecoderTest(unittest.TestCase):
             self.assertEqual(e.code, constants.BUFFER_TOO_SMALL)
 
         try:
-            packet = decoder.decode(dec, packet, 3, 960, 0)
+             decoder.decode(dec, packet, 3, 960, 0)
+        except OpusError:
+            self.fail('Decode failed')
+
+        decoder.destroy(dec)
+
+    def test_decode_float(self):
+        dec = decoder.create(48000, 2)
+
+        packet = chr(63<<2)+chr(0)+chr(0)
+        try:
+            decoder.decode_float(dec, packet, 3, 960, 0)
         except OpusError:
             self.fail('Decode failed')
 

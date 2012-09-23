@@ -12,6 +12,8 @@ from exceptions import OpusError
 libopus = ctypes.CDLL(find_library('opus'))
 c_int_pointer = ctypes.POINTER(ctypes.c_int)
 c_int16_pointer = ctypes.POINTER(ctypes.c_int16)
+float_pointer = ctypes.POINTER(ctypes.c_float)
+
 
 class Decoder(ctypes.Structure):
     """Opus decoder state.
@@ -129,7 +131,7 @@ _decode.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, c_int16_poi
 _decode.restype = ctypes.c_int
 
 def decode(decoder, data, length, frame_size, decode_fec):
-    pcm_size =  frame_size*2*ctypes.sizeof(ctypes.c_int16)  # TODO: channels value must be changeable
+    pcm_size = frame_size*2*ctypes.sizeof(ctypes.c_int16)  # TODO: channels value must be changeable
     pcm = (ctypes.c_int16*pcm_size)()
     pcm_pointer = ctypes.cast(pcm, c_int16_pointer)
 
@@ -141,6 +143,26 @@ def decode(decoder, data, length, frame_size, decode_fec):
         raise OpusError(result, strerror(result))
 
     return array.array('h', pcm).tostring()
+
+
+_decode_float = libopus.opus_decode_float
+_decode_float.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, float_pointer, ctypes.c_int, ctypes.c_int)
+_decode_float.restype = ctypes.c_int
+
+def decode_float(decoder, data, length, frame_size, decode_fec):
+    pcm_size = frame_size*2*ctypes.sizeof(ctypes.c_float)  # TODO: channels value must be changeable
+    pcm = (ctypes.c_float*pcm_size)()
+    pcm_pointer = ctypes.cast(pcm, float_pointer)
+
+    # Converting from a boolean to int
+    decode_fec = int(bool(decode_fec))
+
+    result = _decode_float(decoder, data, length, pcm_pointer, frame_size, decode_fec)
+    if result < 0:
+        raise OpusError(result, strerror(result))
+
+    return array.array('f', pcm).tostring()
+
 
 destroy = libopus.opus_decoder_destroy
 destroy.argtypes = (DecoderPointer,)
