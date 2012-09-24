@@ -11,7 +11,7 @@ before_install:
     - 'git clone -b v1.0.1 --depth 1 git://git.xiph.org/opus.git /tmp/opus'
     - '/tmp/opus/autogen.sh'
     - '/tmp/opus/configure'
-    - 'cd /tmp/opus && sudo make install'
+    - 'cd /tmp/opus && make && sudo make install'
 
 # Install test dependencies
 install:
