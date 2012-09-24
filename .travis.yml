@@ -9,8 +9,7 @@ python:
 # Compile C library
 before_install:
     - 'git clone -b v1.0.1 --depth 1 git://git.xiph.org/opus.git /tmp/opus'
-    - '/tmp/opus/autogen.sh'
-    - '/tmp/opus/configure'
+    - 'cd /tmp/opus && ./autogen.sh && ./configure'
     - 'cd /tmp/opus && make && sudo make install'
 
 # Install test dependencies
