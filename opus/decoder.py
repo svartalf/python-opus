@@ -36,6 +36,7 @@ _create = libopus.opus_decoder_create
 _create.argtypes = (ctypes.c_int, ctypes.c_int, c_int_pointer)
 _create.restype = DecoderPointer
 
+
 def create(fs, channels):
     """Allocates and initializes a decoder state"""
 
@@ -51,6 +52,7 @@ def create(fs, channels):
 _packet_get_bandwidth = libopus.opus_packet_get_bandwidth
 _packet_get_bandwidth.argtypes = (ctypes.c_char_p,)
 _packet_get_bandwidth.restype = ctypes.c_int
+
 
 def packet_get_bandwidth(data):
     """Gets the bandwidth of an Opus packet."""
@@ -68,6 +70,7 @@ _packet_get_nb_channels = libopus.opus_packet_get_nb_channels
 _packet_get_nb_channels.argtypes = (ctypes.c_char_p,)
 _packet_get_nb_channels.restype = ctypes.c_int
 
+
 def packet_get_nb_channels(data):
     """Gets the number of channels from an Opus packet"""
 
@@ -83,6 +86,7 @@ def packet_get_nb_channels(data):
 _packet_get_nb_frames = libopus.opus_packet_get_nb_frames
 _packet_get_nb_frames.argtypes = (ctypes.c_char_p, ctypes.c_int)
 _packet_get_nb_frames.restype = ctypes.c_int
+
 
 def packet_get_nb_frames(data, length=None):
     """Gets the number of frames in an Opus packet"""
@@ -102,6 +106,7 @@ _packet_get_samples_per_frame = libopus.opus_packet_get_samples_per_frame
 _packet_get_samples_per_frame.argtypes = (ctypes.c_char_p, ctypes.c_int)
 _packet_get_samples_per_frame.restype = ctypes.c_int
 
+
 def packet_get_samples_per_frame(data, fs):
     """Gets the number of samples per frame from an Opus packet"""
 
@@ -118,6 +123,7 @@ _get_nb_samples = libopus.opus_decoder_get_nb_samples
 _get_nb_samples.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32)
 _get_nb_samples.restype = ctypes.c_int
 
+
 def get_nb_samples(decoder, packet, length):
     result = _get_nb_samples(decoder, packet, length)
     if result < 0:
@@ -129,6 +135,7 @@ def get_nb_samples(decoder, packet, length):
 _decode = libopus.opus_decode
 _decode.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, c_int16_pointer, ctypes.c_int, ctypes.c_int)
 _decode.restype = ctypes.c_int
+
 
 def decode(decoder, data, length, frame_size, decode_fec):
     pcm_size = frame_size*2*ctypes.sizeof(ctypes.c_int16)  # TODO: channels value must be changeable
@@ -148,6 +155,7 @@ def decode(decoder, data, length, frame_size, decode_fec):
 _decode_float = libopus.opus_decode_float
 _decode_float.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, float_pointer, ctypes.c_int, ctypes.c_int)
 _decode_float.restype = ctypes.c_int
+
 
 def decode_float(decoder, data, length, frame_size, decode_fec):
     pcm_size = frame_size*2*ctypes.sizeof(ctypes.c_float)  # TODO: channels value must be changeable

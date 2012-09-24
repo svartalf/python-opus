@@ -20,9 +20,11 @@ class Encoder(ctypes.Structure):
 
 EncoderPointer = ctypes.POINTER(Encoder)
 
+
 _get_size = libopus.opus_encoder_get_size
 _get_size.argtypes = (ctypes.c_int,)
 _get_size.restype = ctypes.c_int
+
 
 def get_size(channels):
     """Gets the size of an OpusEncoder structure."""
@@ -32,9 +34,11 @@ def get_size(channels):
 
     return _get_size(channels)
 
+
 _create = libopus.opus_encoder_create
 _create.argtypes = (ctypes.c_int, ctypes.c_int, ctypes.c_int, c_int_pointer)
 _create.restype = EncoderPointer
+
 
 def create(fs, channels, application):
     """Allocates and initializes an encoder state."""
