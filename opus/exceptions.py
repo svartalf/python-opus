@@ -1,8 +1,10 @@
+from opus.api.info import strerror
+
+
 class OpusError(Exception):
 
-    def __init__(self, code, message):
+    def __init__(self, code):
         self.code = code
-        self.message = message
 
     def __str__(self):
-        return self.message
+        return strerror(self.code)

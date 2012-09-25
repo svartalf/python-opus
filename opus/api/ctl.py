@@ -2,7 +2,7 @@
 
 Usage example:
 
-    from opus import decoder, ctl
+    from opus.api import decoder, ctl
 
     dec = decoder.create(48000, 2)
     decoder.ctl(dec, ctl.set_gain, -15)
@@ -12,9 +12,8 @@ Usage example:
 
 import ctypes
 
-import constants
-from info import strerror
-from exceptions import OpusError
+from opus.api import constants
+from opus.exceptions import OpusError
 
 
 def query(request):
@@ -24,7 +23,7 @@ def query(request):
         result_code = func(obj, request)
 
         if result_code is not constants.OK:
-            raise OpusError(result_code, strerror(result_code))
+            raise OpusError(result_code)
 
         return result_code
 
@@ -39,7 +38,7 @@ def get(request, result_type):
         result_code = func(obj, request, ctypes.byref(result))
 
         if result_code is not constants.OK:
-            raise OpusError(result_code, strerror(result_code))
+            raise OpusError(result_code)
 
         return result.value
 
@@ -52,7 +51,7 @@ def set(request):
     def inner(func, obj, value):
         result_code = func(obj, request, value)
         if result_code is not constants.OK:
-            raise OpusError(result_code, strerror(result_code))
+            raise OpusError(result_code)
 
     return inner
 

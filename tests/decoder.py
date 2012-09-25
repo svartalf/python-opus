@@ -3,7 +3,7 @@
 import unittest
 import sys
 
-from opus import decoder, constants, ctl
+from opus.api import decoder, constants, ctl
 from opus.exceptions import OpusError
 
 

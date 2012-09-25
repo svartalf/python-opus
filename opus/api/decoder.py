@@ -2,14 +2,11 @@
 
 import array
 import ctypes
-from ctypes.util import find_library
 
-from info import strerror
-import constants
-from exceptions import OpusError
+from opus.api import constants, libopus
+from opus.exceptions import OpusError
 
 
-libopus = ctypes.CDLL(find_library('opus'))
 c_int_pointer = ctypes.POINTER(ctypes.c_int)
 c_int16_pointer = ctypes.POINTER(ctypes.c_int16)
 float_pointer = ctypes.POINTER(ctypes.c_float)
@@ -44,7 +41,7 @@ def create(fs, channels):
 
     result = _create(fs, channels, ctypes.byref(result_code))
     if result_code.value is not 0:
-        raise OpusError(result_code.value, strerror(result_code.value))
+        raise OpusError(result_code.value)
 
     return result
 
@@ -61,7 +58,7 @@ def packet_get_bandwidth(data):
 
     result = _packet_get_bandwidth(data_pointer)
     if result < 0:
-        raise OpusError(result, strerror(result))
+        raise OpusError(result)
 
     return result
 
@@ -78,7 +75,7 @@ def packet_get_nb_channels(data):
 
     result = _packet_get_nb_channels(data_pointer)
     if result < 0:
-        raise OpusError(result, strerror(result))
+        raise OpusError(result)
 
     return result
 
@@ -97,7 +94,7 @@ def packet_get_nb_frames(data, length=None):
 
     result = _packet_get_nb_frames(data_pointer, ctypes.c_int(length))
     if result < 0:
-        raise OpusError(result, strerror(result))
+        raise OpusError(result)
 
     return result
 
@@ -114,7 +111,7 @@ def packet_get_samples_per_frame(data, fs):
 
     result = _packet_get_nb_frames(data_pointer, ctypes.c_int(fs))
     if result < 0:
-        raise OpusError(result, strerror(result))
+        raise OpusError(result)
 
     return result
 
@@ -127,7 +124,7 @@ _get_nb_samples.restype = ctypes.c_int
 def get_nb_samples(decoder, packet, length):
     result = _get_nb_samples(decoder, packet, length)
     if result < 0:
-        raise OpusError(result, strerror(result))
+        raise OpusError(result)
 
     return result
 
@@ -147,7 +144,7 @@ def decode(decoder, data, length, frame_size, decode_fec):
 
     result = _decode(decoder, data, length, pcm_pointer, frame_size, decode_fec)
     if result < 0:
-        raise OpusError(result, strerror(result))
+        raise OpusError(result)
 
     return array.array('h', pcm).tostring()
 
@@ -167,7 +164,7 @@ def decode_float(decoder, data, length, frame_size, decode_fec):
 
     result = _decode_float(decoder, data, length, pcm_pointer, frame_size, decode_fec)
     if result < 0:
-        raise OpusError(result, strerror(result))
+        raise OpusError(result)
 
     return array.array('f', pcm).tostring()
 
