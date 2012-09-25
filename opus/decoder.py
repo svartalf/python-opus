@@ -21,6 +21,7 @@ class Decoder(object):
             # Destroying state only if __init__ completed successfully
             decoder.destroy(self._state)
 
+
     def reset_state(self):
         """Resets the codec state to be equivalent to a freshly initialized state"""
 

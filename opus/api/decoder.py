@@ -180,7 +180,7 @@ _ctl.restype = ctypes.c_int
 
 
 def ctl(decoder, request, value=None):
-    if value:
+    if value is not None:
         return request(_ctl, decoder, value)
 
     return request(_ctl, decoder)

@@ -149,10 +149,10 @@ get_sample_rate = get(constants.GET_SAMPLE_RATE_REQUEST, ctypes.c_int)
 get_lookahead = get(constants.GET_LOOKAHEAD_REQUEST, ctypes.c_int)
 
 # Configures the encoder's use of inband forward error correction (FEC)
-set_inband = set(constants.SET_INBAND_FEC_REQUEST)
+set_inband_fec = set(constants.SET_INBAND_FEC_REQUEST)
 
 # Gets encoder's configured use of inband forward error correction
-get_inband = get(constants.GET_INBAND_FEC_REQUEST, ctypes.c_int)
+get_inband_fec = get(constants.GET_INBAND_FEC_REQUEST, ctypes.c_int)
 
 # Configures the encoder's expected packet loss percentage
 set_packet_loss_perc = set(constants.SET_PACKET_LOSS_PERC_REQUEST)

@@ -7,7 +7,7 @@ from opus.exceptions import OpusError
 
 
 c_int_pointer = ctypes.POINTER(ctypes.c_int)
-
+c_int16_pointer = ctypes.POINTER(ctypes.c_int16)
 
 class Encoder(ctypes.Structure):
     """Opus encoder state.
@@ -56,10 +56,21 @@ _ctl.restype = ctypes.c_int
 
 
 def ctl(encoder, request, value=None):
-    if value:
+    if value is not None:
         return request(_ctl, encoder, value)
 
     return request(_ctl, encoder)
+
+
+_encode = libopus.opus_encode
+_encode.argtypes = (EncoderPointer, c_int16_pointer, ctypes.c_int, ctypes.c_char_p, ctypes.c_int32)
+_encode.restype = ctypes.c_int32
+
+
+def encode(encoder, pcm, frame_size, max_data_bytes):
+    data = ctypes.c_char()
+    return _encode(encoder, pcm, frame_size, data, max_data_bytes)
+
 
 destroy = libopus.opus_encoder_destroy
 destroy.argtypes = (EncoderPointer,)
