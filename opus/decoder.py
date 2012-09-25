@@ -175,6 +175,7 @@ def decode_float(decoder, data, length, frame_size, decode_fec):
 _ctl = libopus.opus_decoder_ctl
 _ctl.restype = ctypes.c_int
 
+
 def ctl(decoder, request, value=None):
     if value:
         return request(_ctl, decoder, value)
