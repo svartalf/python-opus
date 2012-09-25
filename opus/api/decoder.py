@@ -3,7 +3,7 @@
 import array
 import ctypes
 
-from opus.api import constants, libopus
+from opus.api import libopus
 from opus.exceptions import OpusError
 
 
@@ -134,8 +134,14 @@ _decode.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, c_int16_poi
 _decode.restype = ctypes.c_int
 
 
-def decode(decoder, data, length, frame_size, decode_fec):
-    pcm_size = frame_size*2*ctypes.sizeof(ctypes.c_int16)  # TODO: channels value must be changeable
+def decode(decoder, data, length, frame_size, decode_fec, channels=2):
+    """Decode an Opus frame
+
+    Unlike the `opus_decode` function , this function takes an additional parameter `channels`,
+    which indicates the number of channels in the frame
+    """
+
+    pcm_size = frame_size*channels*ctypes.sizeof(ctypes.c_int16)
     pcm = (ctypes.c_int16*pcm_size)()
     pcm_pointer = ctypes.cast(pcm, c_int16_pointer)
 
@@ -154,8 +160,8 @@ _decode_float.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, float
 _decode_float.restype = ctypes.c_int
 
 
-def decode_float(decoder, data, length, frame_size, decode_fec):
-    pcm_size = frame_size*2*ctypes.sizeof(ctypes.c_float)  # TODO: channels value must be changeable
+def decode_float(decoder, data, length, frame_size, decode_fec, channels=2):
+    pcm_size = frame_size*channels*ctypes.sizeof(ctypes.c_float)
     pcm = (ctypes.c_float*pcm_size)()
     pcm_pointer = ctypes.cast(pcm, float_pointer)
 
