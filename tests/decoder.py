@@ -3,7 +3,7 @@
 import unittest
 import sys
 
-from opus import decoder, constants
+from opus import decoder, constants, ctl
 from opus.exceptions import OpusError
 
 
@@ -62,12 +62,69 @@ class DecoderTest(unittest.TestCase):
             # TODO: rewrite this code
         # VG_CHECK(dec,opus_decoder_get_size(2));
 
-    #def test_decode(self):
-    #    dec = decoder.create(48000, 2)
-    #
-    #    packet = ''.join([chr(x) for x in (63<<2, 0, 0)])
-    #
-    #    self.assertEqual(960, decoder.decode(dec, packet, 3, 960, False))
+    def test_get_final_range(self):
+        dec = decoder.create(48000, 2)
+        decoder.ctl(dec, ctl.get_final_range)
+        decoder.destroy(dec)
+
+    def test_unimplemented(self):
+        dec = decoder.create(48000, 2)
+        try:
+            decoder.ctl(dec, ctl.unimplemented)
+        except OpusError as e:
+            self.assertEqual(e.code, constants.UNIMPLEMENTED)
+        decoder.destroy(dec)
+
+    def test_get_bandwidth(self):
+        dec = decoder.create(48000, 2)
+        value = decoder.ctl(dec, ctl.get_bandwidth)
+        self.assertEqual(value, 0)
+        decoder.destroy(dec)
+
+    def test_get_pitch(self):
+        dec = decoder.create(48000, 2)
+
+        i = decoder.ctl(dec, ctl.get_pitch)
+        self.assertIn(i, (-1, 0))
+
+        packet = chr(63<<2)+chr(0)+chr(0)
+        decoder.decode(dec, packet, 3, 960, False)
+        i = decoder.ctl(dec, ctl.get_pitch)
+        self.assertIn(i, (-1, 0))
+
+        packet = chr(1)+chr(0)+chr(0)
+        decoder.decode(dec, packet, 3, 960, False)
+        i = decoder.ctl(dec, ctl.get_pitch)
+        self.assertIn(i, (-1, 0))
+
+        decoder.destroy(dec)
+
+    def test_gain(self):
+        dec = decoder.create(48000, 2)
+
+        i = decoder.ctl(dec, ctl.get_gain)
+        self.assertEqual(i, 0)
+
+        try:
+            decoder.ctl(dec, ctl.set_gain, -32769)
+        except OpusError as e:
+            self.assertEqual(e.code, constants.BAD_ARG)
+
+        try:
+            decoder.ctl(dec, ctl.set_gain, 32768)
+        except OpusError as e:
+            self.assertEqual(e.code, constants.BAD_ARG)
+
+        decoder.ctl(dec, ctl.set_gain, -15)
+        i = decoder.ctl(dec, ctl.get_gain)
+        self.assertEqual(i, -15)
+
+        decoder.destroy(dec)
+
+    def test_reset_state(self):
+        dec = decoder.create(48000, 2)
+        decoder.ctl(dec, ctl.reset_state)
+        decoder.destroy(dec)
 
     def test_get_nb_samples(self):
         """opus_decoder_get_nb_samples()"""

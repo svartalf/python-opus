@@ -172,6 +172,16 @@ def decode_float(decoder, data, length, frame_size, decode_fec):
     return array.array('f', pcm).tostring()
 
 
+_ctl = libopus.opus_decoder_ctl
+_ctl.restype = ctypes.c_int
+
+def ctl(decoder, request, value=None):
+    if value:
+        return request(_ctl, decoder, value)
+
+    return request(_ctl, decoder)
+
+
 destroy = libopus.opus_decoder_destroy
 destroy.argtypes = (DecoderPointer,)
 destroy.restype = None

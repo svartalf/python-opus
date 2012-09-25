@@ -53,6 +53,17 @@ def create(fs, channels, application):
 
     return result
 
+
+_ctl = libopus.opus_encoder_ctl
+_ctl.restype = ctypes.c_int
+
+
+def ctl(encoder, request, value=None):
+    if value:
+        return request(_ctl, encoder, value)
+
+    return request(_ctl, encoder)
+
 destroy = libopus.opus_encoder_destroy
 destroy.argtypes = (EncoderPointer,)
 destroy.restype = None
