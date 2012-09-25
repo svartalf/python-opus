@@ -5,6 +5,8 @@ from ctypes.util import find_library
 
 import constants
 from info import strerror
+from exceptions import OpusError
+
 
 libopus = ctypes.CDLL(find_library('opus'))
 c_int_pointer = ctypes.POINTER(ctypes.c_int)
@@ -47,7 +49,7 @@ def create(fs, channels, application):
 
     result = _create(fs, channels, application, ctypes.byref(result_code))
     if result_code.value is not constants.OK:
-        raise ValueError(strerror(result_code.value))
+        raise OpusError(result_code.value, strerror(result_code.value))
 
     return result
 
