@@ -23,9 +23,9 @@ class EncoderTest(unittest.TestCase):
                 if i == -5:
                     fs = -8000
                 elif i == -6:
-                    fs = sys.maxint
+                    fs = sys.maxint  # TODO: Must be an INT32_MAX
                 elif i == -7:
-                    fs = -1*(sys.maxint-1)
+                    fs = -1*(sys.maxint-1)  # TODO: Must be an INT32_MIN
                 else:
                     fs = i
 
