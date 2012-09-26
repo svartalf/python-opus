@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import ctypes
+import array
 
 from opus.api import constants, libopus
 from opus.exceptions import OpusError
@@ -68,8 +69,19 @@ _encode.restype = ctypes.c_int32
 
 
 def encode(encoder, pcm, frame_size, max_data_bytes):
-    data = ctypes.c_char()
-    return _encode(encoder, pcm, frame_size, data, max_data_bytes)
+    """Encodes an Opus frame
+
+    Returns string output payload
+    """
+
+    pcm = ctypes.cast(pcm, c_int16_pointer)
+    data = (ctypes.c_char*max_data_bytes)()
+
+    result = _encode(encoder, pcm, frame_size, data, max_data_bytes)
+    if result < 0:
+        raise OpusError(result)
+
+    return array.array('c', data[:result]).tostring()
 
 
 destroy = libopus.opus_encoder_destroy

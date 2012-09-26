@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import ctypes
 import unittest
 import sys
 
@@ -54,6 +55,12 @@ class EncoderTest(unittest.TestCase):
         # TODO: rewrite that code
         # err=opus_encoder_ctl(enc,OPUS_GET_LOOKAHEAD(&i));
         # if(err!=OPUS_OK || i<0 || i>32766)test_failed();
+        encoder.destroy(enc)
+
+    def test_encode(self):
+        enc = encoder.create(48000, 2, constants.APPLICATION_AUDIO)
+        data = chr(0)*ctypes.sizeof(ctypes.c_short)*2*960
+        encoder.encode(enc, data, 960, len(data))
         encoder.destroy(enc)
 
     def test_unimplemented(self):
