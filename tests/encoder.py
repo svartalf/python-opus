@@ -63,6 +63,12 @@ class EncoderTest(unittest.TestCase):
         encoder.encode(enc, data, 960, len(data))
         encoder.destroy(enc)
 
+    def test_encode_float(self):
+        enc = encoder.create(48000, 2, constants.APPLICATION_AUDIO)
+        data = chr(0)*ctypes.sizeof(ctypes.c_float)*2*960
+        encoder.encode_float(enc, data, 960, len(data))
+        encoder.destroy(enc)
+
     def test_unimplemented(self):
         enc = encoder.create(48000, 2, constants.APPLICATION_AUDIO)
         try:

@@ -9,6 +9,7 @@ from opus.exceptions import OpusError
 
 c_int_pointer = ctypes.POINTER(ctypes.c_int)
 c_int16_pointer = ctypes.POINTER(ctypes.c_int16)
+c_float_pointer = ctypes.POINTER(ctypes.c_float)
 
 class Encoder(ctypes.Structure):
     """Opus encoder state.
@@ -78,6 +79,23 @@ def encode(encoder, pcm, frame_size, max_data_bytes):
     data = (ctypes.c_char*max_data_bytes)()
 
     result = _encode(encoder, pcm, frame_size, data, max_data_bytes)
+    if result < 0:
+        raise OpusError(result)
+
+    return array.array('c', data[:result]).tostring()
+
+
+_encode_float = libopus.opus_encode_float
+_encode_float.argtypes = (EncoderPointer, c_float_pointer, ctypes.c_int, ctypes.c_char_p, ctypes.c_int32)
+_encode_float.restype = ctypes.c_int32
+
+def encode_float(encoder, pcm, frame_size, max_data_bytes):
+    """Encodes an Opus frame from floating point input"""
+
+    pcm = ctypes.cast(pcm, c_float_pointer)
+    data = (ctypes.c_char*max_data_bytes)()
+
+    result = _encode_float(encoder, pcm, frame_size, data, max_data_bytes)
     if result < 0:
         raise OpusError(result)
 
