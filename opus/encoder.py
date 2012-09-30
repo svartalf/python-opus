@@ -1,6 +1,12 @@
 """High-level interface to a opus.api.encoder functions"""
 
-from opus.api import encoder, ctl
+from opus.api import encoder, ctl, constants
+
+APPLICATION_TYPES_MAP = {
+    'voip': constants.APPLICATION_VOIP,
+    'audio': constants.APPLICATION_AUDIO,
+    'restricted_lowdelay': constants.APPLICATION_RESTRICTED_LOWDELAY,
+}
 
 
 class Encoder(object):
@@ -11,6 +17,13 @@ class Encoder(object):
             fs : sampling rate
             channels : number of channels
         """
+
+        if application in APPLICATION_TYPES_MAP.keys():
+            application = APPLICATION_TYPES_MAP[application]
+        elif application in APPLICATION_TYPES_MAP.values():
+            pass  # Nothing to do here
+        else:
+            raise ValueError("`application` value must be in 'voip', 'audio' or 'restricted_lowdelay'")
 
         self._fs = fs
         self._channels = channels
