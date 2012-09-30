@@ -9,7 +9,7 @@ setup(
     author_email='self@svartalf.info',
     url='https://github.com/svartalf/python-opus',
     description='Python bindings to the libopus, IETF low-delay audio codec',
-    packages=('opus',),
+    packages=('opus', 'opus.api'),
     test_suite='tests',
     classifiers=(
         'Development Status :: 1 - Planning',
