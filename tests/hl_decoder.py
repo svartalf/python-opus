@@ -93,17 +93,3 @@ class DecoderTest(unittest.TestCase):
             decoder.decode_float(packet, frame_size=960)
         except OpusError:
             self.fail('Decode failed')
-
-'''
-    def test_decode_float(self):
-        dec = decoder.create(48000, 2)
-
-        packet = chr(63<<2)+chr(0)+chr(0)
-        try:
-            decoder.decode_float(dec, packet, 3, 960, 0)
-        except OpusError:
-            self.fail('Decode failed')
-
-        decoder.destroy(dec)
-
-'''
