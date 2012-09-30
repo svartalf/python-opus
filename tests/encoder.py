@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import ctypes
-import unittest
 import sys
+try:
+    import unittest2 as unittest # For Python<=2.6
+except ImportError:
+    import unittest
 
 from opus.api import encoder, constants, ctl
 from opus.exceptions import OpusError
