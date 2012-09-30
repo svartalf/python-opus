@@ -3,13 +3,8 @@
 import array
 import ctypes
 
-from opus.api import libopus
+from opus.api import libopus, c_int_pointer, c_int16_pointer, c_float_pointer
 from opus.exceptions import OpusError
-
-
-c_int_pointer = ctypes.POINTER(ctypes.c_int)
-c_int16_pointer = ctypes.POINTER(ctypes.c_int16)
-float_pointer = ctypes.POINTER(ctypes.c_float)
 
 
 class Decoder(ctypes.Structure):
@@ -141,8 +136,8 @@ def decode(decoder, data, length, frame_size, decode_fec, channels=2):
     which indicates the number of channels in the frame
     """
 
-    pcm_size = frame_size*channels*ctypes.sizeof(ctypes.c_int16)
-    pcm = (ctypes.c_int16*pcm_size)()
+    pcm_size = frame_size * channels * ctypes.sizeof(ctypes.c_int16)
+    pcm = (ctypes.c_int16 * pcm_size)()
     pcm_pointer = ctypes.cast(pcm, c_int16_pointer)
 
     # Converting from a boolean to int
@@ -156,14 +151,14 @@ def decode(decoder, data, length, frame_size, decode_fec, channels=2):
 
 
 _decode_float = libopus.opus_decode_float
-_decode_float.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, float_pointer, ctypes.c_int, ctypes.c_int)
+_decode_float.argtypes = (DecoderPointer, ctypes.c_char_p, ctypes.c_int32, c_float_pointer, ctypes.c_int, ctypes.c_int)
 _decode_float.restype = ctypes.c_int
 
 
 def decode_float(decoder, data, length, frame_size, decode_fec, channels=2):
-    pcm_size = frame_size*channels*ctypes.sizeof(ctypes.c_float)
-    pcm = (ctypes.c_float*pcm_size)()
-    pcm_pointer = ctypes.cast(pcm, float_pointer)
+    pcm_size = frame_size * channels * ctypes.sizeof(ctypes.c_float)
+    pcm = (ctypes.c_float * pcm_size)()
+    pcm_pointer = ctypes.cast(pcm, c_float_pointer)
 
     # Converting from a boolean to int
     decode_fec = int(bool(decode_fec))
