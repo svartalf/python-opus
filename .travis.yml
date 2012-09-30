@@ -21,4 +21,5 @@ install:
 before_script:
     - 'pep8 --ignore=E501,E225 opus'
 
-script: python setup.py test
+script:
+    - 'LD_PRELOAD=/usr/local/lib/libopus.so python setup.py test'
